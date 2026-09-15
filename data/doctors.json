@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Dr. Amara Silva",
+    "specialty": "General Physician",
+    "hospital": "City General Hospital",
+    "availableTimes": ["09:00", "10:00", "11:00", "14:00", "15:00"]
+  },
+  {
+    "name": "Dr. Nuwan Perera",
+    "specialty": "Dentist",
+    "hospital": "Lakeside Medical Centre",
+    "availableTimes": ["10:00", "11:00", "13:00", "16:00"]
+  },
+  {
+    "name": "Dr. Chamari Fernando",
+    "specialty": "Pediatrician",
+    "hospital": "City General Hospital",
+    "availableTimes": ["09:00", "12:00", "14:00", "17:00"]
+  },
+  {
+    "name": "Dr. Kasun Jayasuriya",
+    "specialty": "Dermatologist",
+    "hospital": "Riverside Clinic",
+    "availableTimes": ["11:00", "13:00", "15:00", "16:00"]
+  }
+]
