@@ -1,26 +1,156 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand-bg: #F8F7F2;
+
+  --color-brand-teal: #174A4A;
+  --color-brand-tealDark: #103737;
+
+  --color-brand-sage: #A8C3A0;
+  --color-brand-sageLight: #DCEBDD;
+  --color-brand-sageDark: #789A72;
+
+  --color-brand-gold: #D4AF63;
+  --color-brand-goldLight: #F1E5C8;
+
+  --color-brand-coral: #E98B78;
+  --color-brand-indigo: #5B7C8D;
+  --color-brand-emerald: #3D8B70;
+  --color-brand-rose: #D98F9A;
+
+  --color-brand-text: #263333;
+  --color-brand-muted: #6B7775;
+
+  --color-brand-white: #FFFFFF;
+  --color-brand-card: #FFFFFF;
+  --color-brand-border: #E2E8E2;
+
+  /* VoiceBot colors */
+  --color-voice-primary: #174A4A;
+  --color-voice-soft: #DCEBDD;
+  --color-voice-glow: #A8C3A0;
+
+  /* ================================
+     Fonts
+     ================================ */
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-sans: "Inter", Arial, sans-serif;
+
+  /* ================================
+     Animations
+     ================================ */
+
+  --animate-pulse-ring: pulse-ring
+  1.6s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
+
+  --animate-pop-in: pop-in 0.35s ease-out;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Used by ticket-notch pseudo elements */
+  --ticket-notch-bg: #F8F7F2;
+
+  /* Font fallbacks */
+  --font-fraunces: "Fraunces", Georgia, serif;
+  --font-inter: "Inter", Arial, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ================================
+   VoiceBot Pulse Animation
+   ================================ */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ================================
+   General Pop-in Animation
+   ================================ */
+
+@keyframes pop-in {
+  0% {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
+
+/* ================================
+   Base
+   ================================ */
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--color-brand-bg);
+  color: var(--color-brand-text);
+  font-family: var(--font-inter);
+}
+
+/* ================================
+   Ticket Punch Holes
+   ================================ */
+
+.ticket-notch::before,
+.ticket-notch::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+
+  width: 20px;
+  height: 20px;
+
+  border-radius: 9999px;
+
+  background: var(--ticket-notch-bg);
+
+  transform: translateY(-50%);
+}
+
+.ticket-notch::before {
+  left: -10px;
+}
+
+.ticket-notch::after {
+  right: -10px;
+}
+
+/* ================================
+   Accessible Keyboard Focus
+   ================================ */
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-brand-sageDark);
+  outline-offset: 2px;
+}
+
+/* ================================
+   Reduced Motion
+   ================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse-ring,
+  .animate-pop-in {
+    animation: none !important;
+  }
+}
+
