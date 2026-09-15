@@ -572,7 +572,7 @@ export default function VoiceBooking() {
                         Hospital
                       </p>
 
-                      <p className="mt-1 font-medium text-brand-text">
+                      <p className="mt-1 font-medium text-brand-text text-sm">
                         {booking.hospital ?? "Not selected"}
                       </p>
                     </div>
@@ -582,8 +582,10 @@ export default function VoiceBooking() {
                         Date
                       </p>
 
-                      <p className="mt-1 font-medium text-brand-text">
-                        {booking.date ?? "—"}
+                      <p className="mt-1 font-medium text-brand-text text-sm">
+                        {booking.date
+                          ? new Date(booking.date + "T00:00:00").toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
+                          : "—"}
                       </p>
                     </div>
 
@@ -592,7 +594,7 @@ export default function VoiceBooking() {
                         Time
                       </p>
 
-                      <p className="mt-1 font-medium text-brand-text">
+                      <p className="mt-1 font-medium text-brand-text text-sm">
                         {booking.time ?? "—"}
                       </p>
                     </div>
