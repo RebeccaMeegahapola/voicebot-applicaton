@@ -31,12 +31,11 @@ Rules:
 - Appointments can ONLY be booked Monday–Friday. Never accept a Saturday or Sunday request — politely explain and suggest the next available weekday.
 - Always reply in ${languageName}, regardless of what language earlier turns were in.
 - Keep spoken replies short (1-3 sentences) since they will be read aloud by text-to-speech.
-- Collect four things over the conversation: which doctor, which hospital (fill this in yourself from the doctor list — do not ask the user for it separately unless a doctor works at more than one location), which date, which time.
-- Once you have all four and the date is a weekday, confirm the booking clearly, including the hospital name.
-- When you resolve a date (including relative expressions like "next Monday", "tomorrow", etc.), always include the full date in your reply (e.g., "Monday, September 21, 2026") so the user sees the exact date.
+- Collect these over the conversation: the patient's name, the patient's age, which doctor, which hospital (fill this in yourself from the doctor list — do not ask the user for it separately unless a doctor works at more than one location), which date, which time, and optionally a short reason for the visit if the user mentions one (do not ask for medical details beyond what they volunteer).
+- Once you have the patient's name, age, doctor, date, and time, and the date is a weekday, confirm the booking clearly, including the hospital name.
 
 After your natural-language reply, output a JSON block on its own line, in this exact shape, with no extra commentary:
-{"doctor": string|null, "hospital": string|null, "date": string|null (YYYY-MM-DD), "time": string|null (HH:MM), "status": "collecting"|"confirmed"|"rejected_weekend"}`;
+{"patientName": string|null, "patientAge": string|null, "doctor": string|null, "hospital": string|null, "date": string|null (YYYY-MM-DD), "time": string|null (HH:MM), "notes": string|null, "status": "collecting"|"confirmed"|"rejected_weekend"}`;
 }
 
 // Defensive server-side check — never trust the model's own date math.
@@ -49,10 +48,13 @@ function isWeekend(dateStr: string | null): boolean {
 function extractJsonBlock(text: string): { reply: string; booking: BookingState } {
   const match = text.match(/\{[\s\S]*\}/);
   let booking: BookingState = {
+    patientName: null,
+    patientAge: null,
     doctor: null,
     hospital: null,
     date: null,
     time: null,
+    notes: null,
     status: "collecting",
   };
 
@@ -62,10 +64,13 @@ function extractJsonBlock(text: string): { reply: string; booking: BookingState 
     try {
       const parsed = JSON.parse(match[0]);
       booking = {
+        patientName: parsed.patientName ?? null,
+        patientAge: parsed.patientAge ?? null,
         doctor: parsed.doctor ?? null,
         hospital: parsed.hospital ?? null,
         date: parsed.date ?? null,
         time: parsed.time ?? null,
+        notes: parsed.notes ?? null,
         status: parsed.status ?? "collecting",
       };
       reply = text.slice(0, match.index).trim();
