@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Doctor Booking Voicebot
 
-## Getting Started
+A multilingual voice assistant for booking a doctor's appointment, built as a
+technical assignment. Speak or type naturally, in any of six languages, and
+the assistant collects the doctor, hospital, date, and time — enforcing that
+appointments can only be booked Monday–Friday.
 
-First, run the development server:
+**Live demo:** https://voicebot-applicaton.vercel.app/booking
+
+## Features
+
+- **Voice in, voice out** — uses the browser's built-in Web Speech API for
+  speech recognition and text-to-speech, so no external voice service is
+  required.
+- **Six languages** — English, Sinhala, French, Chinese, Greek, and
+  Italian. One language picker controls both what the assistant listens for
+  and what language it replies in.
+- **Weekdays only** — the assistant is instructed never to accept a weekend
+  date, and this is independently re-checked in server-side code, so a
+  Saturday/Sunday booking can never slip through even if the model errs.
+- **Structured booking state** — alongside its natural-language reply, the
+  assistant returns a small JSON object (doctor, hospital, date, time,
+  status) which drives a live "appointment ticket" summary in the UI.
+- **Graceful language fallback** — if the browser has no voice installed for
+  a selected language (common for Sinhala), the assistant's reply is shown
+  as text instead of spoken aloud, and the user can always type instead of
+  using the microphone.
+
+## How it works
+
+| Piece | What it does |
+|---|---|
+| `src/components/VoiceBooking.tsx` | The client UI — language picker, mic button, conversation view, appointment ticket. |
+| `src/app/api/booking-agent/route.ts` | The one server route that talks to the Gemini API. Builds a system prompt (clinic role, doctor list, weekday rule, target language), sends the conversation, and parses a JSON block out of the model's reply. |
+| `src/data/doctors.json` | Mock clinic data — 4 doctors, their specialty, hospital, and available weekday time slots. |
+| `src/data/languages.ts` | The six supported languages, their BCP-47 codes (for speech recognition/synthesis), and their identity colors in the UI. |
+
+**Why an LLM instead of per-language logic:** rather than writing separate
+intent-parsing code for six languages, a single prompt tells the model to
+always reply in whichever language the user is speaking. This collapses the
+"multilingual" requirement into one system prompt instead of six parallel
+pipelines.
+
+**Why the weekday check happens twice:** the prompt instructs the model to
+refuse weekend requests, but the code never trusts that alone — every date
+the model returns is re-validated server-side (`getDay() === 0 || 6`) before
+being treated as a real booking.
+
+## Tech stack
+
+- Next.js (App Router) + TypeScript
+- Tailwind CSS v4
+- Google Gemini API (`gemini-3.5-flash-lite`) — free tier, no billing required
+- Web Speech API (browser-native, no external STT/TTS service)
+- Deployed on Vercel
+
+## Known limitation
+
+Browser support for Sinhala speech recognition and text-to-speech is
+inconsistent across browsers and devices. The app detects this automatically
+— if no matching voice is available, the assistant's reply is shown as text
+rather than silently failing, and typing is always available as a fallback
+input method. This is a browser platform limitation, not a gap in the
+booking logic itself.
+
+## Running it locally
 
 ```bash
+npm install
+cp .env.local.example .env.local   # add a free Gemini API key from https://aistudio.google.com/apikey
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open `http://localhost:3000` (redirects to `/booking`).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Trying it out
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Pick a language, tap the mic (or type), and say something like:
 
-## Learn More
+> "I'd like to see a dentist next Tuesday at 2pm."
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The assistant will confirm the doctor, hospital, date, and time as it
+collects them, and will refuse/redirect if you ask for a Saturday or Sunday.
